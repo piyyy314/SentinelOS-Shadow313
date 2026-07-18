@@ -5,7 +5,17 @@
       "has": [
         {
           "type": "host",
-          "value": "shadow313.(?<domain>.*)"
+          "value": "shadow313.dev"
+        }
+      ],
+      "destination": "/sentinelos/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "shadow313.com"
         }
       ],
       "destination": "/shadow313/$1"
@@ -15,10 +25,10 @@
       "has": [
         {
           "type": "host",
-          "value": "sentinel.(?<domain>.*)"
+          "value": "www.shadow313.com"
         }
       ],
-      "destination": "/sentinelos/$1"
+      "destination": "/shadow313/$1"
     }
   ]
 }
