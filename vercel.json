@@ -1,0 +1,24 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "shadow313.(?<domain>.*)"
+        }
+      ],
+      "destination": "/shadow313/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "sentinel.(?<domain>.*)"
+        }
+      ],
+      "destination": "/sentinelos/$1"
+    }
+  ]
+}
