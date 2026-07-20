@@ -460,13 +460,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     };
 
+    const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[ch]));
+
     const addChatMsg = (type, text) => {
         const div = document.createElement('div');
         div.className = `s313-chat-msg ${type}`;
-        // Preserve newlines
-        div.innerHTML = text.replace(/\n/g, '<br>');
+        // Preserve newlines without allowing user-provided HTML injection.
+        div.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
         chatScreen.appendChild(div);
         chatScreen.scrollTop = chatScreen.scrollHeight;
+    };
+
+    const fetchAiResponse = async (input) => {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: input})
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.reply) throw new Error(data.error || 'AI request failed');
+        return data.reply;
     };
 
     const handleChatInput = () => {
@@ -478,22 +497,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const category = classifyQuestion(input);
 
-        setTimeout(() => {
-            if (category && chatResponses[category]) {
-                const resp = chatResponses[category];
-                addChatMsg('system', `[${resp.category}] classified`);
-                setTimeout(() => {
-                    addChatMsg('response', resp.respond(input));
-                    // Perform temporal bind for this answer
-                    performTemporalBind();
-                    addChatMsg('system', `  ↳ 313-bound temporal signature: ${simHash(input).slice(0, 24)}...`);
-                }, 400);
-            } else {
-                addChatMsg('response', `⬡ [general] I processed your query "${input}" through the thought engine.\n  This would be routed to the quantum-classical hybrid agent in a full deployment.\n  Current backend: ${backendSelect?.value || 'local_sim'}`);
+        setTimeout(async () => {
+            try {
+                addChatMsg('system', '[ai-gateway] routing request');
+                const reply = await fetchAiResponse(input);
+                addChatMsg('response', reply);
+            } catch (error) {
+                console.warn('AI Gateway unavailable, using local Shadow313 fallback', error);
+                if (category && chatResponses[category]) {
+                    const resp = chatResponses[category];
+                    addChatMsg('system', `[${resp.category}] classified locally`);
+                    addChatMsg('response', `${resp.respond(input)}
+
+[Local fallback: AI Gateway is unavailable or not configured.]`);
+                } else {
+                    addChatMsg('response', `⬡ [general] I processed your query "${input}" through the local thought engine.
+  Current backend: ${backendSelect?.value || 'local_sim'}
+  [Local fallback: AI Gateway is unavailable or not configured.]`);
+                }
+            } finally {
                 performTemporalBind();
+                addChatMsg('system', `  ↳ 313-bound temporal signature: ${simHash(input).slice(0, 24)}...`);
             }
         }, 200);
     };
+
 
     if (btnSend) {
         btnSend.addEventListener('click', handleChatInput);

@@ -1,6 +1,36 @@
 {
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "shadow313.dev"
+        }
+      ],
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "shadow313.com"
+        }
+      ],
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.shadow313.com"
+        }
+      ],
+      "destination": "/api/$1"
+    },
+    {
       "source": "/(.*)",
       "has": [
         {
