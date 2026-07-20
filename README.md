@@ -22,6 +22,10 @@ These projects are built from the ground up prioritizing speed, security, and ae
 *   **Quantum Thought Engine (QTE):** Terminal-based AI agent interface for running local quantum algorithms via Qiskit's AerSimulator protocols.
 *   **AEGIS Ultimate Master Deployment:** Includes the AEGIS Python master deployment script for Monte Carlo threat simulations and active defense honeypots.
 
+## Uploading Project Files
+
+This repository now includes tracked placeholder directories for future asset and fixture uploads. See [docs/upload-paths.md](docs/upload-paths.md) for the canonical path map for SentinelOS and SHADOW313 files.
+
 ## Getting Started
 
 ### Deploy to Vercel
