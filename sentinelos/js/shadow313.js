@@ -499,21 +499,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(async () => {
             try {
-                addChatMsg('system', '[ai-gateway] routing request');
+                addChatMsg('system', '[local-ollama-cli] static web demo; use Shadow313 CLI for live Ollama');
                 const reply = await fetchAiResponse(input);
                 addChatMsg('response', reply);
             } catch (error) {
-                console.warn('AI Gateway unavailable, using local Shadow313 fallback', error);
+                console.warn('Using local Shadow313 demo response', error);
                 if (category && chatResponses[category]) {
                     const resp = chatResponses[category];
                     addChatMsg('system', `[${resp.category}] classified locally`);
                     addChatMsg('response', `${resp.respond(input)}
 
-[Local fallback: AI Gateway is unavailable or not configured.]`);
+[Static demo: live Ollama responses run from your local Shadow313 CLI.]`);
                 } else {
                     addChatMsg('response', `⬡ [general] I processed your query "${input}" through the local thought engine.
   Current backend: ${backendSelect?.value || 'local_sim'}
-  [Local fallback: AI Gateway is unavailable or not configured.]`);
+  [Static demo: live Ollama responses run from your local Shadow313 CLI.]`);
                 }
             } finally {
                 performTemporalBind();

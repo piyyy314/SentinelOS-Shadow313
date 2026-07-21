@@ -46,3 +46,19 @@ Then navigate to `http://localhost:8081/shadow313/` or `http://localhost:8081/se
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+
+### Local Ollama CLI mode
+
+The Vercel website is a static demo. Live AI responses are intended to run locally through Shadow313 CLI connected to Ollama:
+
+```bash
+ollama serve
+ollama pull mistral:7b
+shadow313 config --set ai.backend ollama
+shadow313 config --set ai.endpoint http://localhost:11434
+shadow313 config --set ai.model mistral:7b
+shadow313 ask "hello"
+```
+
+Vercel production cannot reach `http://localhost:11434` on a developer machine.

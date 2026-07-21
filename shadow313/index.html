@@ -929,8 +929,8 @@ footer {
     <p class="hero-sub">Advanced Quantum-Ready CLI Platform</p>
     <p class="hero-tagline">
         The world's first <strong>verifiable, intelligent, local-first</strong> quantum developer platform.
-        Multi-backend orchestration. Autonomous Quantum Agent. 313 Temporal Binding.
-        <strong>No PhD. No cloud account. No limits.</strong>
+        Ollama-powered CLI mode for local AI runs. 313 Temporal Binding.
+        <strong>No cloud AI key required for local CLI use.</strong>
     </p>
     <div class="hero-actions">
         <div class="install-pill">
@@ -1010,8 +1010,8 @@ footer {
         <div class="arch-row">
             <div class="arch-layer accent-cyan">
                 <div class="arch-layer-label">AI Subsystem</div>
-                <div class="arch-layer-title"><i class="fa-solid fa-brain"></i> Quantum Thought Engine</div>
-                <div class="arch-layer-desc">Goal reasoning · NL2QC · Hybrid orchestration · Algorithm selection · Learning loop</div>
+                <div class="arch-layer-title"><i class="fa-solid fa-brain"></i> Local Ollama Thought Engine</div>
+                <div class="arch-layer-desc">Local CLI prompts · Ollama endpoint · Algorithm selection · No browser API key</div>
             </div>
             <div class="arch-layer accent-cyan">
                 <div class="arch-layer-title"><i class="fa-solid fa-arrows-split-up-and-left"></i> Job Orchestrator</div>
@@ -1114,13 +1114,13 @@ footer {
         <!-- Feature 3: Multi-Backend -->
         <div class="bento-card">
             <div class="bento-icon green"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
-            <div class="bento-title">Intelligent Multi-Backend Routing</div>
-            <div class="bento-desc">Cost-aware, performance-aware, and fault-tolerant. SHADOW313 automatically picks the optimal quantum backend for each circuit.</div>
+            <div class="bento-title">Local Ollama CLI Mode</div>
+            <div class="bento-desc">Run live AI locally with Ollama and the Shadow313 CLI. The Vercel site is a static demo and does not ask for browser API keys.</div>
             <div class="backend-grid">
-                <div class="backend-pill"><div class="backend-dot green"></div> Aer (local)</div>
-                <div class="backend-pill"><div class="backend-dot cyan"></div> IBM</div>
-                <div class="backend-pill"><div class="backend-dot amber"></div> AWS Braket</div>
-                <div class="backend-pill"><div class="backend-dot purple"></div> Google</div>
+                <div class="backend-pill"><div class="backend-dot green"></div> Ollama localhost:11434</div>
+                <div class="backend-pill"><div class="backend-dot cyan"></div> Shadow313 CLI</div>
+                <div class="backend-pill"><div class="backend-dot amber"></div> Qiskit Aer local</div>
+                <div class="backend-pill"><div class="backend-dot purple"></div> Vercel static demo</div>
             </div>
             <span class="bento-tag">Pro + Enterprise</span>
         </div>
@@ -1243,8 +1243,8 @@ footer {
 <!-- ============================================================ QTE SECTION -->
 <section class="section" id="qte-section">
     <div class="section-label"><i class="fa-solid fa-brain"></i> Quantum Thought Engine</div>
-    <div class="section-title underline-glow">Your Autonomous Quantum Agent</div>
-    <p class="section-desc">Describe your goal in plain English. The QTE selects the algorithm, generates the circuit, manages hybrid loops, and returns 313-bound results.</p>
+    <div class="section-title underline-glow">Local Ollama CLI Mode</div>
+    <p class="section-desc">The Vercel page is a static demo. For live AI, run Shadow313 on your machine with Ollama at <code>http://localhost:11434</code>.</p>
 
     <div class="qte-layout">
         <div class="qte-chat">
@@ -1252,22 +1252,29 @@ footer {
                 <div class="qte-msg">
                     <div class="qte-avatar agent"><i class="fa-solid fa-atom"></i></div>
                     <div class="qte-bubble agent">
-                        SHADOW313 QTE online. I can execute quantum algorithms, generate circuits, analyze results, and bind every run to a cryptographic timestamp. What would you like to compute today?
+                        SHADOW313 local mode. Live AI runs through your local CLI connected to Ollama, not through a browser API key. Use the commands on the right to start Ollama and test the CLI.
                     </div>
                 </div>
             </div>
             <div class="qte-input-row">
-                <input type="text" class="qte-input" id="qte-input" placeholder="e.g. 'factor 15 using Shor's', 'find minimum of this function', 'generate 512 random bits'...">
+                <input type="text" class="qte-input" id="qte-input" placeholder="Static demo input; live Ollama runs from the Shadow313 CLI...">
                 <button class="qte-send" id="qte-send"><i class="fa-solid fa-paper-plane"></i> Send</button>
             </div>
         </div>
         <div class="qte-sidebar">
             <div class="qte-stat-card">
                 <h4>Engine Status</h4>
-                <div class="qte-stat-row"><span class="qte-stat-k">Backend</span><span class="qte-stat-v green">Aer v0.14.1</span></div>
+                <div class="qte-stat-row"><span class="qte-stat-k">Backend</span><span class="qte-stat-v green">Ollama CLI local</span></div>
                 <div class="qte-stat-row"><span class="qte-stat-k">Q-Runs</span><span class="qte-stat-v cyan" id="qte-runs">0</span></div>
                 <div class="qte-stat-row"><span class="qte-stat-k">Binds Created</span><span class="qte-stat-v purple" id="qte-binds">0</span></div>
-                <div class="qte-stat-row"><span class="qte-stat-k">Mode</span><span class="qte-stat-v amber">Hybrid</span></div>
+                <div class="qte-stat-row"><span class="qte-stat-k">Mode</span><span class="qte-stat-v amber">Local only</span></div>
+            </div>
+            <div class="qte-stat-card">
+                <h4>Local Ollama Setup</h4>
+                <div class="qte-stat-row"><span class="qte-stat-k">1</span><span class="qte-stat-v green">ollama serve</span></div>
+                <div class="qte-stat-row"><span class="qte-stat-k">2</span><span class="qte-stat-v cyan">ollama pull mistral:7b</span></div>
+                <div class="qte-stat-row"><span class="qte-stat-k">3</span><span class="qte-stat-v purple">shadow313 ask "hello"</span></div>
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.6;margin-top:10px;">Vercel cannot connect to localhost:11434 on your computer. Use the CLI for live Ollama responses.</div>
             </div>
             <div class="qte-stat-card">
                 <h4>Quick Commands</h4>
@@ -1919,7 +1926,7 @@ function sendQteMessage(msg) {
         const thinkDiv = document.createElement('div'); thinkDiv.className = 'qte-msg';
         const av = document.createElement('div'); av.className = 'qte-avatar agent'; av.innerHTML = '<i class="fa-solid fa-atom"></i>';
         const bubble = document.createElement('div'); bubble.className = 'qte-bubble agent';
-        bubble.innerHTML = `<div class="qte-code">${formatQteText('[QTE] Routing request to AI Gateway...\n[QTE] Preparing quantum assistant context...')}</div>`;
+        bubble.innerHTML = `<div class="qte-code">${formatQteText('[QTE] Static web demo...\n[QTE] For live AI, run Shadow313 CLI with Ollama locally...')}</div>`;
         thinkDiv.appendChild(av); thinkDiv.appendChild(bubble);
         document.getElementById('qte-messages').appendChild(thinkDiv);
         document.getElementById('qte-messages').scrollTop = 99999;
@@ -1936,7 +1943,7 @@ function sendQteMessage(msg) {
                     thinkDiv.remove();
                     appendQteMsg('agent', `${localResp.result}
 
-[Local fallback: AI Gateway is unavailable or not configured.]`);
+[Static demo: live Ollama responses run from your local Shadow313 CLI.]`);
                 }, 900);
             } finally {
                 qteRunCount++; qteBindCount++;
