@@ -247,8 +247,8 @@
             let progress = 0;
             const barInt = setInterval(() => {
                 progress += 5;
-                document.getElementById('df-lip-fill').style.width = progress + '%';
-                document.getElementById('df-audio-fill').style.width = progress + '%';
+                document.getElementById('df-lip-fill').textContent = progress + '%';
+                document.getElementById('df-audio-fill').textContent = progress + '%';
                 document.getElementById('df-prob').textContent = progress + '%';
                 if (progress >= 94) {
                     clearInterval(barInt);

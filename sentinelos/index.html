@@ -1172,7 +1172,91 @@
                     </div>
                 </section>
 
-                <!-- 13. SHADOW313 QUANTUM KERNEL -->
+
+                <!-- 13. NEXT-GEN EXPERIMENTAL TOOLS -->
+                <section id="view-pqc" class="view-pane">
+                    <div class="view-header">
+                        <h2>⬡ PQC Scanner</h2>
+                        <p>Review vulnerable cryptographic surfaces and simulate migration to post-quantum Kyber profiles.</p>
+                    </div>
+                    <div class="glass-card" style="padding:20px; min-height:340px;">
+                        <canvas id="pqc-matrix-canvas" style="width:100%; height:220px; display:block; margin-bottom:20px;"></canvas>
+                        <div class="tool-grid">
+                            <div class="glass-card" style="padding:16px;">
+                                <strong>RSA-2048 Gateway</strong>
+                                <p>Estimated quantum crack window: <span class="crack-val text-red">8 HOURS</span></p>
+                                <button class="btn btn-primary btn-migrate">MIGRATE</button>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <strong>ECC-P256 API Node</strong>
+                                <p>Estimated quantum crack window: <span class="crack-val text-red">3 HOURS</span></p>
+                                <button class="btn btn-primary btn-migrate">MIGRATE</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="view-swarm" class="view-pane">
+                    <div class="view-header">
+                        <h2>⬡ Autonomous Swarm</h2>
+                        <p>Deploy simulated defensive agents to isolate hostile anomalies across the protected mesh.</p>
+                    </div>
+                    <div class="glass-card" style="padding:20px; min-height:420px;">
+                        <canvas id="swarm-canvas" style="width:100%; height:320px; display:block;"></canvas>
+                        <div class="s313-sat-metrics">
+                            <div class="s313-metric"><span class="s313-metric-label">Agents</span><span class="s313-metric-value" id="swarm-count">0</span></div>
+                            <div class="s313-metric"><span class="s313-metric-label">Threats</span><span class="s313-metric-value text-red" id="swarm-threats">1</span></div>
+                            <div class="s313-metric"><span class="s313-metric-label">Status</span><span class="s313-metric-value" id="swarm-status-log">STANDBY</span></div>
+                        </div>
+                        <button class="btn btn-primary" id="btn-deploy-swarm">Deploy Swarm</button>
+                    </div>
+                </section>
+
+                <section id="view-deepfake" class="view-pane">
+                    <div class="view-header">
+                        <h2>⬡ Deepfake Analyzer</h2>
+                        <p>Inspect synthetic media signals with facial mesh and spectral consistency simulations.</p>
+                    </div>
+                    <div class="glass-card" style="padding:20px;">
+                        <div id="df-face" style="position:relative; min-height:180px; border:1px solid var(--border); border-radius:12px; margin-bottom:16px; display:flex; align-items:center; justify-content:center;">
+                            <div class="df-scan-overlay" style="position:absolute; left:0; top:0; width:100%; height:0; background:rgba(255,71,87,0.18); transition:height .2s;"></div>
+                            <i class="fa-solid fa-user-secret" style="font-size:64px;"></i>
+                        </div>
+                        <canvas id="df-audio-canvas" style="width:100%; height:120px; display:block;"></canvas>
+                        <p>Lip-sync coherence: <span id="df-lip-fill">0%</span></p>
+                        <p>Audio spectral match: <span id="df-audio-fill">0%</span></p>
+                        <p>Probability: <span id="df-prob">0%</span></p>
+                        <p id="df-verdict" class="df-verdict">Awaiting sample analysis.</p>
+                        <button class="btn btn-primary" id="btn-df-analyze">Analyze Sample</button>
+                    </div>
+                </section>
+
+                <section id="view-rf" class="view-pane">
+                    <div class="view-header">
+                        <h2>⬡ RF Spectrum</h2>
+                        <p>Sweep nearby simulated spectrum signals and identify rogue transmitters.</p>
+                    </div>
+                    <div class="glass-card" style="padding:20px; min-height:420px;">
+                        <canvas id="rf-radar-canvas" style="width:100%; height:300px; display:block;"></canvas>
+                        <ul id="rf-signal-list" style="list-style:none; padding:0; margin:16px 0;"></ul>
+                        <button class="btn btn-primary" id="btn-rf-sweep">Run RF Sweep</button>
+                    </div>
+                </section>
+
+                <section id="view-ztna" class="view-pane">
+                    <div class="view-header">
+                        <h2>⬡ Zero-Trust Matrix</h2>
+                        <p>Visualize trust cells, breach injection, and micro-segmentation containment controls.</p>
+                    </div>
+                    <div class="glass-card" style="padding:20px;">
+                        <div id="ztna-scene" style="min-height:240px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px;"></div>
+                        <div id="ztna-logs" class="font-mono" style="min-height:80px; color:var(--text-muted);">&gt; Matrix stable.</div>
+                        <button class="btn btn-primary" id="btn-ztna-breach">Simulate Breach</button>
+                        <button class="btn btn-secondary" id="btn-ztna-reset">Reset Matrix</button>
+                    </div>
+                </section>
+
+                <!-- 14. SHADOW313 QUANTUM KERNEL -->
                 <section id="view-shadow313" class="view-pane">
                     <div class="view-header">
                         <h2>⬡ Shadow313 — Quantum Kernel & Satellite Uplink</h2>
@@ -1382,6 +1466,7 @@
     <script src="js/chaos.js"></script>
     <script src="js/deception.js"></script>
     <script src="js/sandbox.js"></script>
+    <script src="js/advanced-tools.js"></script>
     <script src="js/shadow313.js"></script>
 </body>
 </html>
