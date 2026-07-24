@@ -478,18 +478,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchAiResponse = async (input) => {
-        const response = await fetch('http://localhost:11434/api/generate', {
+        const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                model: 'llama3.2',
-                prompt: input,
-                stream: false
-            })
+            body: JSON.stringify({ message: input })
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.response) throw new Error(data.error || 'Ollama request failed');
-        return data.response;
+        if (!response.ok || !data.reply) throw new Error(data.error || 'AI Gateway request failed');
+        return data.reply;
     };
 
     const handleChatInput = () => {
