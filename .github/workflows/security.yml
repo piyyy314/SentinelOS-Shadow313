@@ -7,6 +7,10 @@ on:
       - devops-foundation
   pull_request:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   security:
     name: Security checks
