@@ -1,0 +1,21 @@
+name: Shadow313 Vercel Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy Production
+        run: vercel --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"

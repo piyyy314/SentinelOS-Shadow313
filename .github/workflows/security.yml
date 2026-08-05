@@ -1,0 +1,30 @@
+name: Shadow313 Security Scan
+
+on:
+  push:
+    branches:
+      - master
+      - devops-foundation
+  pull_request:
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+  security:
+    name: Security checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, python
+
+      - name: Analyze CodeQL
+        uses: github/codeql-action/analyze@v3
