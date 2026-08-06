@@ -36,6 +36,10 @@ This repository is optimized for Vercel.
    *   `shadow313.com` ➔ SHADOW313 Terminal Interface
    *   `shadow313.dev` ➔ SentinelOS Advanced Dashboard
 
+### AI Gateway
+
+`POST /api/chat` uses Vercel AI Gateway with `openai/gpt-5.5` by default. Deployed Vercel Functions authenticate automatically with `VERCEL_OIDC_TOKEN`; no production API key is required. For local development, create an AI Gateway key in the [AI Gateway API Keys page](https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai-gateway%2Fapi-keys&title=AI+Gateway+API+Keys) and set `AI_GATEWAY_API_KEY`. Optionally set `AI_GATEWAY_MODEL` to override the model.
+
 ### Run Locally
 To run the project locally, simply start a local web server from the root directory:
 ```bash
