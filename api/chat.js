@@ -36,9 +36,13 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 405, { error: 'Method not allowed' });
   }
 
-  // Vercel provides this OIDC token automatically in deployed Functions.
-  // An API key remains the local-development fallback.
-  const gatewayToken = process.env.VERCEL_OIDC_TOKEN || process.env.AI_GATEWAY_API_KEY;
+  // In deployed Vercel Functions the OIDC token arrives on the request as the
+  // `x-vercel-oidc-token` header. The VERCEL_OIDC_TOKEN env var is only populated
+  // during builds and local development. An API key remains the explicit fallback.
+  const gatewayToken =
+    req.headers['x-vercel-oidc-token'] ||
+    process.env.VERCEL_OIDC_TOKEN ||
+    process.env.AI_GATEWAY_API_KEY;
   if (!gatewayToken) {
     return sendJson(res, 503, {
       error: 'AI Gateway is not configured yet.',
