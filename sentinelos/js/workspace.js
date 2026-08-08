@@ -108,14 +108,26 @@
         if (!chatMessages) return;
         const msg = document.createElement('div');
         msg.className = `chat-message ${isUser ? 'user-member' : 'agent-ai'}`;
-        
-        msg.innerHTML = `
-            <span class="avatar">${avatar}</span>
-            <div class="msg-bubble">
-                <div class="msg-author">${author}</div>
-                <div class="msg-text">${text}</div>
-            </div>
-        `;
+
+        const avatarSpan = document.createElement('span');
+        avatarSpan.className = 'avatar';
+        avatarSpan.textContent = avatar;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+
+        const authorDiv = document.createElement('div');
+        authorDiv.className = 'msg-author';
+        authorDiv.textContent = author;
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'msg-text';
+        textDiv.textContent = text;
+
+        bubble.appendChild(authorDiv);
+        bubble.appendChild(textDiv);
+        msg.appendChild(avatarSpan);
+        msg.appendChild(bubble);
         chatMessages.appendChild(msg);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     };
