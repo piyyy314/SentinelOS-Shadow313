@@ -1,5 +1,6 @@
 const AI_GATEWAY_URL = 'https://ai-gateway.vercel.sh/v1/chat/completions';
 const DEFAULT_MODEL = 'openai/gpt-5.5';
+const DEFAULT_OLLAMA_URL = 'http://127.0.0.1:11434';
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
@@ -36,6 +37,8 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 405, { error: 'Method not allowed' });
   }
 
+  const ollamaBaseUrl = process.env.OLLAMA_BASE_URL;
+
   // In deployed Vercel Functions the OIDC token arrives on the request as the
   // `x-vercel-oidc-token` header. The VERCEL_OIDC_TOKEN env var is only populated
   // during builds and local development. An API key remains the explicit fallback.
@@ -43,9 +46,15 @@ module.exports = async function handler(req, res) {
     req.headers['x-vercel-oidc-token'] ||
     process.env.VERCEL_OIDC_TOKEN ||
     process.env.AI_GATEWAY_API_KEY;
-  if (!gatewayToken) {
+  if (!ollamaBaseUrl && !gatewayToken) {
     return sendJson(res, 503, {
-      error: 'AI Gateway is not configured yet.',
+      error: 'Configure AI Gateway or OLLAMA_BASE_URL.',
+      fallback: true,
+    });
+  }
+  if (ollamaBaseUrl && !process.env.OLLAMA_MODEL) {
+    return sendJson(res, 503, {
+      error: 'Set OLLAMA_MODEL for the local Ollama provider.',
       fallback: true,
     });
   }
@@ -63,6 +72,47 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const systemMessage = {
+      role: 'system',
+      content:
+        'You are SHADOW313 QTE, a concise quantum-computing assistant for a static Vercel demo. Be accurate, label simulations clearly, and never claim real quantum hardware execution unless the user provides external results.',
+    };
+    const allMessages = [systemMessage, ...messages];
+
+    if (ollamaBaseUrl) {
+      const baseUrl = ollamaBaseUrl.replace(/\/$/, '') || DEFAULT_OLLAMA_URL;
+      const ollamaResponse = await fetch(`${baseUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: process.env.OLLAMA_MODEL,
+          messages: allMessages,
+          options: { temperature: 0.4, num_predict: 500 },
+          stream: false,
+        }),
+      });
+
+      if (!ollamaResponse.ok) {
+        const detail = await ollamaResponse.text();
+        console.error('Ollama error', ollamaResponse.status, detail.slice(0, 500));
+        return sendJson(res, 502, {
+          error: 'The local Ollama service encountered a temporary issue.',
+          fallback: true,
+        });
+      }
+
+      const data = await ollamaResponse.json();
+      const reply = data?.message?.content?.trim();
+      if (!reply) {
+        return sendJson(res, 502, {
+          error: 'The local Ollama service returned an empty response.',
+          fallback: true,
+        });
+      }
+
+      return sendJson(res, 200, { reply });
+    }
+
     const gatewayResponse = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
       headers: {
@@ -73,14 +123,7 @@ module.exports = async function handler(req, res) {
         model: process.env.AI_GATEWAY_MODEL || DEFAULT_MODEL,
         temperature: 0.4,
         max_tokens: 500,
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are SHADOW313 QTE, a concise quantum-computing assistant for a static Vercel demo. Be accurate, label simulations clearly, and never claim real quantum hardware execution unless the user provides external results.',
-          },
-          ...messages,
-        ],
+        messages: allMessages,
       }),
     });
 
