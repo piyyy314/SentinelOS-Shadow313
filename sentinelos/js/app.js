@@ -226,10 +226,17 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const logItem = document.createElement('div');
             logItem.className = 'timeline-item';
-            logItem.innerHTML = `
-                <div class="timeline-time">${time}</div>
-                <div class="timeline-content">${text}</div>
-            `;
+
+            const timeEl = document.createElement('div');
+            timeEl.className = 'timeline-time';
+            timeEl.textContent = time;
+
+            const contentEl = document.createElement('div');
+            contentEl.className = 'timeline-content';
+            contentEl.textContent = text;
+
+            logItem.appendChild(timeEl);
+            logItem.appendChild(contentEl);
             timeline.insertBefore(logItem, timeline.firstChild);
             
             // Keep maximum 8 elements in logs to preserve memory
