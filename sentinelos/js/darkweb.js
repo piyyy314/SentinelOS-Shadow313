@@ -1,5 +1,11 @@
 // --- SENTINELOS Dark Web Monitoring & Breach Scanner ---
 
+const escapeHtml = (str) => {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const btnSearch = document.getElementById('btn-dw-search');
     const txtSearch = document.getElementById('txt-dw-search');
@@ -9,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Standard leak databank templates
     const generateBreachData = (query) => {
-        const domain = query.trim().toLowerCase() || "sentinelos.com";
+        const domain = escapeHtml(query.trim().toLowerCase() || "sentinelos.com");
         return [
             {
                 source: "ALPHA-BAY-REBORN.ONION",
