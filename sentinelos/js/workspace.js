@@ -44,8 +44,22 @@
     };
 
     const executeTerminalCommand = (rawCmd) => {
-        // Echo input command back first
-        appendTermLine(`<span class="prompt">sentinel@core:~$</span> ${rawCmd}`, true);
+        // Echo input command back first - build safely to avoid XSS
+        if (termScreen) {
+            const echoLine = document.createElement('div');
+            echoLine.className = 'term-line';
+            const prompt = document.createElement('span');
+            prompt.className = 'prompt';
+            prompt.textContent = 'sentinel@core:~$';
+            echoLine.appendChild(prompt);
+            echoLine.appendChild(document.createTextNode(' ' + rawCmd));
+            if (cursorLine) {
+                termScreen.insertBefore(echoLine, cursorLine);
+            } else {
+                termScreen.appendChild(echoLine);
+            }
+            termScreen.scrollTop = termScreen.scrollHeight;
+        }
         
         const args = rawCmd.split(' ');
         const cmd = args[0];
@@ -108,26 +122,22 @@
         if (!chatMessages) return;
         const msg = document.createElement('div');
         msg.className = `chat-message ${isUser ? 'user-member' : 'agent-ai'}`;
-
+        
         const avatarSpan = document.createElement('span');
         avatarSpan.className = 'avatar';
         avatarSpan.textContent = avatar;
-
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble';
-
         const authorDiv = document.createElement('div');
         authorDiv.className = 'msg-author';
         authorDiv.textContent = author;
-
         const textDiv = document.createElement('div');
         textDiv.className = 'msg-text';
         textDiv.textContent = text;
-
-        bubble.appendChild(authorDiv);
-        bubble.appendChild(textDiv);
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'msg-bubble';
+        bubbleDiv.appendChild(authorDiv);
+        bubbleDiv.appendChild(textDiv);
         msg.appendChild(avatarSpan);
-        msg.appendChild(bubble);
+        msg.appendChild(bubbleDiv);
         chatMessages.appendChild(msg);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     };
