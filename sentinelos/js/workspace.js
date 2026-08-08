@@ -45,7 +45,7 @@
 
     const executeTerminalCommand = (rawCmd) => {
         // Echo input command back first - build safely to avoid XSS
-        if (termScreen && cursorLine) {
+        if (termScreen) {
             const echoLine = document.createElement('div');
             echoLine.className = 'term-line';
             const prompt = document.createElement('span');
@@ -53,7 +53,11 @@
             prompt.textContent = 'sentinel@core:~$';
             echoLine.appendChild(prompt);
             echoLine.appendChild(document.createTextNode(' ' + rawCmd));
-            termScreen.insertBefore(echoLine, cursorLine);
+            if (cursorLine) {
+                termScreen.insertBefore(echoLine, cursorLine);
+            } else {
+                termScreen.appendChild(echoLine);
+            }
             termScreen.scrollTop = termScreen.scrollHeight;
         }
         
