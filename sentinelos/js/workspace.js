@@ -44,8 +44,18 @@
     };
 
     const executeTerminalCommand = (rawCmd) => {
-        // Echo input command back first
-        appendTermLine(`<span class="prompt">sentinel@core:~$</span> ${rawCmd}`, true);
+        // Echo input command back first - build safely to avoid XSS
+        if (termScreen && cursorLine) {
+            const echoLine = document.createElement('div');
+            echoLine.className = 'term-line';
+            const prompt = document.createElement('span');
+            prompt.className = 'prompt';
+            prompt.textContent = 'sentinel@core:~$';
+            echoLine.appendChild(prompt);
+            echoLine.appendChild(document.createTextNode(' ' + rawCmd));
+            termScreen.insertBefore(echoLine, cursorLine);
+            termScreen.scrollTop = termScreen.scrollHeight;
+        }
         
         const args = rawCmd.split(' ');
         const cmd = args[0];
