@@ -36,17 +36,33 @@ This repository is optimized for Vercel.
    *   `shadow313.com` ➔ SHADOW313 Terminal Interface
    *   `shadow313.dev` ➔ SentinelOS Advanced Dashboard
 
-### AI Gateway
+### AI providers
 
-`POST /api/chat` uses Vercel AI Gateway with `openai/gpt-5.5` by default. Deployed Vercel Functions authenticate automatically with `VERCEL_OIDC_TOKEN`; no production API key is required. For local development, create an AI Gateway key in the [AI Gateway API Keys page](https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai-gateway%2Fapi-keys&title=AI+Gateway+API+Keys) and set `AI_GATEWAY_API_KEY`. Optionally set `AI_GATEWAY_MODEL` to override the model.
+`POST /api/chat` uses Vercel AI Gateway with `openai/gpt-5.5` by default in deployed Vercel Functions. Vercel authenticates production requests with its OIDC token; no production API key is required.
 
-### Run Locally
-To run the project locally, simply start a local web server from the root directory:
+For local Ollama development, run Ollama on `http://127.0.0.1:11434` and configure the Vercel development server with the model you have installed:
+
 ```bash
-# Using Python
-python -m http.server 8081
+export OLLAMA_BASE_URL=http://127.0.0.1:11434
+export OLLAMA_MODEL=<your-ollama-model>
+vercel dev
 ```
-Then navigate to `http://localhost:8081/shadow313/` or `http://localhost:8081/sentinelos/`.
+
+`OLLAMA_BASE_URL` is local-only. Do not set it for Vercel production, because `127.0.0.1` in a Vercel Function is not your computer. Without it, the API uses Vercel AI Gateway. For non-Vercel local development, set `AI_GATEWAY_API_KEY` and optionally `AI_GATEWAY_MODEL` instead.
+
+### Vercel deployment webhooks
+
+`POST /api/webhooks/vercel` accepts signed deployment webhook events. Set the same random value as `VERCEL_WEBHOOK_SECRET` in the Explorer production environment and in the webhook configuration. Subscribe only to **Deployment Succeeded** and **Deployment Error** events. The handler rejects unsigned or malformed payloads.
+
+### Run locally
+
+For the dashboard and API together, use Vercel development mode:
+
+```bash
+vercel dev
+```
+
+Open the local URL printed by the command. The project has no `localhost:8080` configuration.
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
