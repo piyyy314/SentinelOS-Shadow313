@@ -34,6 +34,7 @@ console = Console()
 # PART 1: 100,000 MONTE CARLO SIMULATIONS
 # ==========================================
 def run_100k_simulations():
+    import json
     console.print("[bold cyan]Executing 100,000 Monte Carlo Threat Simulations...[/]")
     start = time.time()
     
@@ -56,11 +57,36 @@ def run_100k_simulations():
     
     exec_time = time.time() - start
     
+    blocked_count = int(np.sum(blocked))
+    healed_count = int(np.sum(healed))
+    critical_count = int(np.sum(critical))
+    survivability = ((100000 - critical_count) / 100000) * 100
+
     console.print(f"[bold green]Simulation Complete in {exec_time:.4f} seconds.[/]")
-    console.print(f"Total Blocked (AI/Honeypot): {np.sum(blocked)}")
-    console.print(f"Auto-Healed (FIM): {np.sum(healed)}")
-    console.print(f"Critical Fails (Level 5): {np.sum(critical)}")
-    console.print(f"Survivability Rate: {((100000 - np.sum(critical)) / 100000) * 100:.3f}%\n")
+    console.print(f"Total Blocked (AI/Honeypot): {blocked_count}")
+    console.print(f"Auto-Healed (FIM): {healed_count}")
+    console.print(f"Critical Fails (Level 5): {critical_count}")
+    console.print(f"Survivability Rate: {survivability:.3f}%\n")
+
+    # Export results to tracked JSON data fixture path
+    try:
+        report_path = "sentinelos/assets/data/aegis_simulation_report.json"
+        os.makedirs(os.path.dirname(report_path), exist_ok=True)
+        report_data = {
+            "last_run": datetime.now().isoformat(),
+            "total_simulations": 100000,
+            "blocked_threats": blocked_count,
+            "auto_healed": healed_count,
+            "critical_fails": critical_count,
+            "survivability_rate": round(survivability, 3),
+            "runtime_seconds": round(exec_time, 4)
+        }
+        with open(report_path, "w") as rf:
+            json.dump(report_data, rf, indent=2)
+        console.print(f"[bold green]Simulation report exported successfully to '{report_path}'[/]\n")
+    except Exception as e:
+        console.print(f"[bold red]Failed to export simulation report: {e}[/]\n")
+
     time.sleep(3)
 
 # ==========================================

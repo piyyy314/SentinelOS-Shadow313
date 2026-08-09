@@ -370,12 +370,89 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========================================================================
-    // 5. CIRCUIT PROFILER — Backend switching
+    // 5. CIRCUIT PROFILER — Backend switching & QASM/Qiskit Exporter
     // ========================================================================
     const profilerData = {
         local_sim: { qubits: [4, 65], depth: [12, 50], q1: [28, 100], q2: [8, 40] },
         fake_ibm: { qubits: [5, 65], depth: [18, 50], q1: [42, 100], q2: [14, 40] }
     };
+
+    const circuitCodes = {
+        bell_state: {
+            qiskit: `from qiskit import QuantumCircuit, Aer, execute\n\n# Create a Bell State circuit\nqc = QuantumCircuit(2, 2)\nqc.h(0)\nqc.cx(0, 1)\nqc.measure([0, 1], [0, 1])\n\n# Execute locally using Aer simulator\nbackend = Aer.get_backend('qasm_simulator')\njob = execute(qc, backend, shots=1024)\nresult = job.result()\ncounts = result.get_counts(qc)\nprint("Counts:", counts)`,
+            qasm: `OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0],q[1];\nmeasure q -> c;`
+        },
+        shors_15: {
+            qiskit: `from qiskit import QuantumCircuit, Aer, execute\nimport numpy as np\n\n# Shor's period-finding circuit approximation (N=15, a=7)\nqc = QuantumCircuit(4, 4)\nqc.h(range(4))\n\n# Controlled modular multiplication\nqc.x(3)\nqc.cx(0, 1)\nqc.cx(1, 2)\nqc.cx(2, 3)\n\n# Quantum Fourier Transform inverse\n# (Simplified representation for 4 qubits)\nqc.h(0)\nqc.cp(np.pi/2, 1, 0)\nqc.h(1)\nqc.cp(np.pi/4, 2, 0)\n\nqc.measure(range(4), range(4))\nbackend = Aer.get_backend('qasm_simulator')\njob = execute(qc, backend, shots=2048)\nresult = job.result()\nprint("Shor factorization counts:", result.get_counts(qc))`,
+            qasm: `OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[4];\ncreg c[4];\nh q[0];\nh q[1];\nh q[2];\nh q[3];\nx q[3];\ncx q[0],q[1];\ncx q[1],q[2];\ncx q[2],q[3];\nmeasure q -> c;`
+        },
+        grovers_search: {
+            qiskit: `from qiskit import QuantumCircuit, Aer, execute\n\n# 2-qubit Grover's Search circuit\nqc = QuantumCircuit(2, 2)\nqc.h([0, 1])\n\n# Oracle for state |11>\nqc.cz(0, 1)\n\n# Diffusion operator\nqc.h([0, 1])\nqc.x([0, 1])\nqc.cz(0, 1)\nqc.x([0, 1])\nqc.h([0, 1])\n\nqc.measure([0, 1], [0, 1])\nbackend = Aer.get_backend('qasm_simulator')\njob = execute(qc, backend, shots=1024)\nresult = job.result()\nprint("Grover search counts:", result.get_counts(qc))`,
+            qasm: `OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[2];\ncreg c[2];\nh q[0];\nh q[1];\ncz q[0],q[1];\nh q[0];\nh q[1];\nmeasure q -> c;`
+        }
+    };
+
+    let activeCircuit = "bell_state";
+    let activeTab = "qiskit";
+
+    const updateCodeExporterUI = () => {
+        const codeTextarea = document.getElementById('txt-s313-code');
+        if (!codeTextarea) return;
+        const currentCircuit = circuitCodes[activeCircuit];
+        if (currentCircuit) {
+            codeTextarea.value = currentCircuit[activeTab] || "";
+        }
+    };
+
+    const fetchCircuitQasm = async (circuitName) => {
+        try {
+            // Attempt to dynamically fetch OpenQASM file from tracked assets
+            const response = await fetch(`/shadow313/assets/circuits/${circuitName}.qasm`);
+            if (response.ok) {
+                const qasmText = await response.text();
+                circuitCodes[circuitName].qasm = qasmText;
+                updateCodeExporterUI();
+                console.log(`Successfully fetched dynamic QASM asset: ${circuitName}.qasm`);
+            }
+        } catch (err) {
+            console.warn(`Dynamic QASM fetch failed, using local fallback:`, err);
+        }
+    };
+
+    // Tabs logic for code exporter
+    const btnTabQiskit = document.getElementById('btn-tab-qiskit');
+    const btnTabQasm = document.getElementById('btn-tab-qasm');
+
+    if (btnTabQiskit && btnTabQasm) {
+        btnTabQiskit.addEventListener('click', () => {
+            btnTabQiskit.classList.add('active');
+            btnTabQasm.classList.remove('active');
+            activeTab = "qiskit";
+            updateCodeExporterUI();
+        });
+        btnTabQasm.addEventListener('click', () => {
+            btnTabQasm.classList.add('active');
+            btnTabQiskit.classList.remove('active');
+            activeTab = "qasm";
+            updateCodeExporterUI();
+        });
+    }
+
+    const copyBtn = document.getElementById('btn-s313-copy-code');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const codeTextarea = document.getElementById('txt-s313-code');
+            if (codeTextarea && codeTextarea.value) {
+                navigator.clipboard.writeText(codeTextarea.value).then(() => {
+                    if (window.showStatusOverlay) {
+                        window.showStatusOverlay("Code Copied", "Quantum circuit code successfully copied to clipboard!", 1200);
+                    } else {
+                        alert("Code copied successfully!");
+                    }
+                });
+            }
+        });
+    }
 
     if (backendSelect) {
         backendSelect.addEventListener('change', () => {
@@ -397,6 +474,12 @@ document.addEventListener('DOMContentLoaded', () => {
         animate('s313-prof-1q', 's313-prof-1q-val', profile.q1);
         animate('s313-prof-2q', 's313-prof-2q-val', profile.q2);
     };
+
+    // Load initial code exporter values and trigger fetch
+    updateCodeExporterUI();
+    fetchCircuitQasm('bell_state');
+    fetchCircuitQasm('shors_15');
+    fetchCircuitQasm('grovers_search');
 
     // ========================================================================
     // 6. QUANTUM CHAT TERMINAL — Thought Engine
@@ -450,9 +533,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const classifyQuestion = (input) => {
         const lower = input.toLowerCase();
-        if (/factor\s*\d+/.test(lower)) return 'factor';
-        if (/find|search|grover/.test(lower)) return 'find';
-        if (/random|predict|qrng|dice/.test(lower)) return 'random';
+        if (/factor\s*\d+/.test(lower)) {
+            activeCircuit = "shors_15";
+            updateCodeExporterUI();
+            return 'factor';
+        }
+        if (/find|search|grover/.test(lower)) {
+            activeCircuit = "grovers_search";
+            updateCodeExporterUI();
+            return 'find';
+        }
+        if (/random|predict|qrng|dice/.test(lower)) {
+            activeCircuit = "bell_state";
+            updateCodeExporterUI();
+            return 'random';
+        }
         if (/superposition/.test(lower)) return 'superposition';
         if (/entangle/.test(lower)) return 'entanglement';
         if (/status/.test(lower)) return 'status';

@@ -212,6 +212,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="hero-visual">
                                 <canvas id="hero-particles-canvas"></canvas>
                             </div>
@@ -1418,6 +1419,21 @@
                                         <div class="s313-prof-track"><div class="s313-prof-fill" id="s313-prof-2q" style="width:35%; --pbar: #ffd700;"></div></div>
                                         <span class="s313-prof-val" id="s313-prof-2q-val">8</span>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Quantum Circuit Code Exporter & QASM Viewer -->
+                            <div class="glass-card s313-code-exporter-panel" style="margin-top: 20px; padding: 20px;">
+                                <div class="s313-panel-header" style="margin-bottom: 12px;">
+                                    <div class="s313-panel-title"><i class="fa-solid fa-code"></i> Quantum Code Exporter</div>
+                                </div>
+                                <div class="s313-code-tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                    <button class="btn btn-secondary btn-sm active" id="btn-tab-qiskit" style="padding: 4px 10px; font-size: 11px;">Qiskit (Python)</button>
+                                    <button class="btn btn-secondary btn-sm" id="btn-tab-qasm" style="padding: 4px 10px; font-size: 11px;">OpenQASM 2.0</button>
+                                </div>
+                                <div class="s313-code-container" style="position: relative;">
+                                    <textarea id="txt-s313-code" readonly class="form-control font-mono" style="font-size: 11px; height: 160px; width: 100%; background: rgba(0,0,0,0.4); border-color: var(--border); color: var(--green); resize: none;"></textarea>
+                                    <button class="btn btn-primary btn-sm" id="btn-s313-copy-code" style="position: absolute; right: 10px; bottom: 10px; padding: 4px 10px; font-size: 11px;"><i class="fa-solid fa-copy"></i> Copy</button>
                                 </div>
                             </div>
 
