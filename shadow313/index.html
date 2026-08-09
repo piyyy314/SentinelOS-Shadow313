@@ -835,7 +835,7 @@ footer {
     .terminal-layout, .qte-layout, .binding-layout { grid-template-columns: 1fr; }
     .pricing-grid { grid-template-columns: 1fr; }
     .arch-row { flex-direction: column; }
-    .roadmap-phase { grid-template-columns: 0 40px 1fr; }
+    .roadmap-phase { grid-template-columns: 40px 1fr; }
     .rp-phase-label { display: none; }
 }
 @media (max-width: 600px) {
@@ -1074,6 +1074,21 @@ footer {
             </div>
         </div>
     </div>
+
+                            <!-- Quantum Circuit Code Exporter & QASM Viewer -->
+                            <div class="glass-card s313-code-exporter-panel" style="margin-top: 20px; padding: 20px;">
+                                <div class="s313-panel-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="s313-panel-title"><i class="fa-solid fa-code"></i> Quantum Code Exporter</div>
+                                </div>
+                                <div class="s313-code-tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                    <button class="btn btn-secondary btn-sm active" id="btn-landing-tab-qiskit" style="padding: 4px 10px; font-size: 11px;">Qiskit (Python)</button>
+                                    <button class="btn btn-secondary btn-sm" id="btn-landing-tab-qasm" style="padding: 4px 10px; font-size: 11px;">OpenQASM 2.0</button>
+                                </div>
+                                <div class="s313-code-container" style="position: relative;">
+                                    <textarea id="txt-landing-s313-code" readonly class="form-control font-mono" style="font-size: 11px; height: 160px; width: 100%; background: rgba(0,0,0,0.4); border-color: var(--border); color: var(--green); resize: none;"></textarea>
+                                    <button class="btn btn-primary btn-sm" id="btn-landing-copy-code" style="position: absolute; right: 10px; bottom: 10px; padding: 4px 10px; font-size: 11px;"><i class="fa-solid fa-copy"></i> Copy</button>
+                                </div>
+                            </div>
 </section>
 
 <!-- ============================================================ FEATURES BENTO -->
@@ -2001,18 +2016,18 @@ bindBtn.addEventListener('click', () => {
 
 // --- ALGORITHM LIBRARY ---
 const algorithms = [
-    { name: "Shor's Factoring Algorithm", cat: "math", desc: "Prime factorization of integers using quantum Fourier transform and period finding. Exponential speedup over classical.", qubits: "2n+3", gates: "O(n³)", runs: 8204 },
-    { name: "Grover's Search", cat: "search", desc: "Quadratic speedup for searching unsorted databases. √N iterations vs N classical.", qubits: "log₂N", gates: "O(√N)", runs: 5102 },
-    { name: "QRNG", cat: "crypto", desc: "True quantum random number generation via Hadamard superposition. Certified randomness from quantum physics.", qubits: "N", gates: "O(N)", runs: 12847 },
-    { name: "VQE (Variational Quantum Eigensolver)", cat: "opt", desc: "Hybrid quantum-classical algorithm for finding ground state energies in quantum chemistry simulations.", qubits: "6-20", gates: "Variable", runs: 3291 },
-    { name: "QAOA", cat: "opt", desc: "Quantum Approximate Optimization Algorithm for combinatorial optimization problems like MaxCut and TSP.", qubits: "N", gates: "2p·N", runs: 2108 },
-    { name: "QKD Protocol (BB84)", cat: "crypto", desc: "Quantum Key Distribution using polarized photon states. Unconditionally secure key exchange.", qubits: "2n", gates: "O(n)", runs: 987 },
-    { name: "VQC Image Classifier", cat: "ml", desc: "Variational quantum circuit as a neural network layer for image classification tasks.", qubits: "4-16", gates: "O(L·n)", runs: 1543 },
-    { name: "Quantum Phase Estimation", cat: "math", desc: "Estimate eigenvalues of unitary operators with exponential precision advantage.", qubits: "n+t", gates: "O(t²)", runs: 4421 },
-    { name: "Quantum Walk Search", cat: "search", desc: "Quantum random walk-based search achieving quadratic speedup on structured graphs.", qubits: "log N", gates: "O(√N)", runs: 876 },
-    { name: "QSVM Kernel", cat: "ml", desc: "Quantum Support Vector Machine using quantum kernel evaluation for enhanced classification boundaries.", qubits: "n", gates: "O(n²)", runs: 2034 },
-    { name: "HHL Linear Solver", cat: "math", desc: "Exponential speedup for solving sparse linear systems of equations Ax=b.", qubits: "O(log n)", gates: "Poly(log n)", runs: 1289 },
-    { name: "Bernstein-Vazirani", cat: "search", desc: "Find hidden bit string in a single query — exponential speedup over classical O(n) queries.", qubits: "n+1", gates: "O(n)", runs: 3847 },
+    { name: "Shor's Factoring Algorithm", cat: "math", desc: "Prime factorization of integers using quantum Fourier transform and period finding. Exponential speedup over classical.", qubits: "2n+3", gates: "O(n³)", runs: 8204, key: "shors_15" },
+    { name: "Grover's Search", cat: "search", desc: "Quadratic speedup for searching unsorted databases. √N iterations vs N classical.", qubits: "log₂N", gates: "O(√N)", runs: 5102, key: "grovers_search" },
+    { name: "QRNG", cat: "crypto", desc: "True quantum random number generation via Hadamard superposition. Certified randomness from quantum physics.", qubits: "N", gates: "O(N)", runs: 12847, key: "bell_state" },
+    { name: "VQE (Variational Quantum Eigensolver)", cat: "opt", desc: "Hybrid quantum-classical algorithm for finding ground state energies in quantum chemistry simulations.", qubits: "6-20", gates: "Variable", runs: 3291, key: "bell_state" },
+    { name: "QAOA", cat: "opt", desc: "Quantum Approximate Optimization Algorithm for combinatorial optimization problems like MaxCut and TSP.", qubits: "N", gates: "2p·N", runs: 2108, key: "bell_state" },
+    { name: "QKD Protocol (BB84)", cat: "crypto", desc: "Quantum Key Distribution using polarized photon states. Unconditionally secure key exchange.", qubits: "2n", gates: "O(n)", runs: 987, key: "bell_state" },
+    { name: "VQC Image Classifier", cat: "ml", desc: "Variational quantum circuit as a neural network layer for image classification tasks.", qubits: "4-16", gates: "O(L·n)", runs: 1543, key: "bell_state" },
+    { name: "Quantum Phase Estimation", cat: "math", desc: "Estimate eigenvalues of unitary operators with exponential precision advantage.", qubits: "n+t", gates: "O(t²)", runs: 4421, key: "bell_state" },
+    { name: "Quantum Walk Search", cat: "search", desc: "Quantum random walk-based search achieving quadratic speedup on structured graphs.", qubits: "log N", gates: "O(√N)", runs: 876, key: "bell_state" },
+    { name: "QSVM Kernel", cat: "ml", desc: "Quantum Support Vector Machine using quantum kernel evaluation for enhanced classification boundaries.", qubits: "n", gates: "O(n²)", runs: 2034, key: "bell_state" },
+    { name: "HHL Linear Solver", cat: "math", desc: "Exponential speedup for solving sparse linear systems of equations Ax=b.", qubits: "O(log n)", gates: "Poly(log n)", runs: 1289, key: "bell_state" },
+    { name: "Bernstein-Vazirani", cat: "search", desc: "Find hidden bit string in a single query — exponential speedup over classical O(n) queries.", qubits: "n+1", gates: "O(n)", runs: 3847, key: "bell_state" },
 ];
 
 let activeFilter = 'all';
@@ -2027,7 +2042,7 @@ function renderAlgos() {
     }).forEach(a => {
         const card = document.createElement('div'); card.className = 'algo-card';
         card.innerHTML = `
-            <button class="algo-card-run" onclick="showToast('Running ${a.name}...')">▶ Run</button>
+            <button class="algo-card-run" onclick="runAlgoFromLib('${a.key}')">▶ Run</button>
             <div class="algo-card-cat ${a.cat}">${a.cat.toUpperCase()}</div>
             <div class="algo-card-name">${a.name}</div>
             <div class="algo-card-desc">${a.desc}</div>
@@ -2057,6 +2072,97 @@ document.querySelectorAll('.algo-chip').forEach(chip => {
         this.classList.add('active');
     });
 });
+
+// --- INTERACTIVE CODE EXPORTER ON LANDING PAGE ---
+const landingCircuitCodes = {
+    bell_state: {
+        qiskit: `from qiskit import QuantumCircuit, Aer, execute\n\n# Create a Bell State circuit\nqc = QuantumCircuit(2, 2)\nqc.h(0)\nqc.cx(0, 1)\nqc.measure([0, 1], [0, 1])\n\n# Execute locally using Aer simulator\nbackend = Aer.get_backend('qasm_simulator')\njob = execute(qc, backend, shots=1024)\nresult = job.result()\ncounts = result.get_counts(qc)\nprint("Counts:", counts)`,
+        qasm: `OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0],q[1];\nmeasure q -> c;`
+    },
+    shors_15: {
+        qiskit: `from qiskit import QuantumCircuit, Aer, execute\nimport numpy as np\n\n# Shor's period-finding circuit approximation (N=15, a=7)\nqc = QuantumCircuit(4, 4)\nqc.h(range(4))\n\n# Controlled modular multiplication\nqc.x(3)\nqc.cx(0, 1)\nqc.cx(1, 2)\nqc.cx(2, 3)\n\n# Quantum Fourier Transform inverse\nqc.h(0)\nqc.cp(np.pi/2, 1, 0)\nqc.h(1)\nqc.cp(np.pi/4, 2, 0)\n\nqc.measure(range(4), range(4))\nbackend = Aer.get_backend('qasm_simulator')\njob = execute(qc, backend, shots=2048)\nresult = job.result()\nprint("Shor factorization counts:", result.get_counts(qc))`,
+        qasm: `OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[4];\ncreg c[4];\nh q[0];\nh q[1];\nh q[2];\nh q[3];\nx q[3];\ncx q[0],q[1];\ncx q[1],q[2];\ncx q[2],q[3];\nmeasure q -> c;`
+    },
+    grovers_search: {
+        qiskit: `from qiskit import QuantumCircuit, Aer, execute\n\n# 2-qubit Grover's Search circuit\nqc = QuantumCircuit(2, 2)\nqc.h([0, 1])\n\n# Oracle for state |11>\nqc.cz(0, 1)\n\n# Diffusion operator\nqc.h([0, 1])\nqc.x([0, 1])\nqc.cz(0, 1)\nqc.x([0, 1])\nqc.h([0, 1])\n\nqc.measure([0, 1], [0, 1])\nbackend = Aer.get_backend('qasm_simulator')\njob = execute(qc, backend, shots=1024)\nresult = job.result()\nprint("Grover search counts:", result.get_counts(qc))`,
+        qasm: `OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[2];\ncreg c[2];\nh q[0];\nh q[1];\ncz q[0],q[1];\nh q[0];\nh q[1];\nmeasure q -> c;`
+    }
+};
+
+let landingActiveCircuit = "bell_state";
+let landingActiveTab = "qiskit";
+
+const updateLandingCodeExporterUI = () => {
+    const codeTextarea = document.getElementById('txt-landing-s313-code');
+    if (!codeTextarea) return;
+    const currentCircuit = landingCircuitCodes[landingActiveCircuit];
+    if (currentCircuit) {
+        codeTextarea.value = currentCircuit[landingActiveTab] || "";
+    }
+};
+
+const fetchLandingCircuitQasm = async (circuitName) => {
+    try {
+        const response = await fetch(`/shadow313/assets/circuits/${circuitName}.qasm`);
+        if (response.ok) {
+            const qasmText = await response.text();
+            landingCircuitCodes[circuitName].qasm = qasmText;
+            updateLandingCodeExporterUI();
+        }
+    } catch (err) {
+        console.warn(`Landing dynamic QASM fetch failed:`, err);
+    }
+};
+
+// Tabs logic for landing page code exporter
+const btnLandingTabQiskit = document.getElementById('btn-landing-tab-qiskit');
+const btnLandingTabQasm = document.getElementById('btn-landing-tab-qasm');
+
+if (btnLandingTabQiskit && btnLandingTabQasm) {
+    btnLandingTabQiskit.addEventListener('click', () => {
+        btnLandingTabQiskit.classList.add('active');
+        btnLandingTabQasm.classList.remove('active');
+        landingActiveTab = "qiskit";
+        updateLandingCodeExporterUI();
+    });
+    btnLandingTabQasm.addEventListener('click', () => {
+        btnLandingTabQasm.classList.add('active');
+        btnLandingTabQiskit.classList.remove('active');
+        landingActiveTab = "qasm";
+        updateLandingCodeExporterUI();
+    });
+}
+
+const landingCopyBtn = document.getElementById('btn-landing-copy-code');
+if (landingCopyBtn) {
+    landingCopyBtn.addEventListener('click', () => {
+        const codeTextarea = document.getElementById('txt-landing-s313-code');
+        if (codeTextarea && codeTextarea.value) {
+            navigator.clipboard.writeText(codeTextarea.value).then(() => {
+                showToast("Circuit code copied to clipboard!");
+            });
+        }
+    });
+}
+
+window.runAlgoFromLib = (key) => {
+    landingActiveCircuit = key;
+    updateLandingCodeExporterUI();
+    fetchLandingCircuitQasm(key);
+    showToast(`Loaded and compiled ${key.replace('_', ' ').toUpperCase()} circuit in Code Exporter.`);
+
+    // Auto scroll to Code Exporter
+    const exporterPanel = document.querySelector('.s313-code-exporter-panel');
+    if (exporterPanel) {
+        exporterPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+};
+
+updateLandingCodeExporterUI();
+fetchLandingCircuitQasm('bell_state');
+fetchLandingCircuitQasm('shors_15');
+fetchLandingCircuitQasm('grovers_search');
+
 
 // --- WAITLIST ---
 document.getElementById('waitlist-btn').addEventListener('click', () => {
