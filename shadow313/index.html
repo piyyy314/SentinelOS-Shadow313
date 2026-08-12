@@ -1912,14 +1912,28 @@ function appendQteMsg(role, html) {
 }
 
 async function fetchQteResponse(msg) {
-    const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({message: msg})
-    });
-    const data = await response.json().catch(() => ({}));
-    if(!response.ok || !data.reply) throw new Error(data.error || 'AI request failed');
-    return data.reply;
+    // Try local FastAPI backend first (connects to Ollama)
+    const endpoints = [
+        'http://localhost:8000/api/chat',   // Local FastAPI proxy → Ollama
+        '/api/chat'                          // Vercel serverless fallback
+    ];
+    let lastError = null;
+    for (const url of endpoints) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg})
+            });
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.reply) return data.reply;
+            lastError = new Error(data.error || data.detail || 'AI request failed');
+        } catch (e) {
+            lastError = e;
+            continue; // try next endpoint
+        }
+    }
+    throw lastError || new Error('All AI endpoints unavailable');
 }
 
 function sendQteMessage(msg) {
