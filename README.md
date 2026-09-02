@@ -52,6 +52,8 @@ You can start from `.env.example` when setting local environment variables.
 
 `OLLAMA_BASE_URL` is local-only. Do not set it for Vercel production, because `127.0.0.1` in a Vercel Function is not your computer. Without it, the API uses Vercel AI Gateway. For non-Vercel local development, set `AI_GATEWAY_API_KEY` and optionally `AI_GATEWAY_MODEL` instead.
 
+The standalone FastAPI backend in `/backend` uses `OLLAMA_URL` and `OLLAMA_MODEL` instead.
+
 ### Vercel deployment webhooks
 
 `POST /api/webhooks/vercel` accepts signed deployment webhook events. Set the same random value as `VERCEL_WEBHOOK_SECRET` in the Explorer production environment and in the webhook configuration. Subscribe only to **Deployment Succeeded** and **Deployment Error** events. The handler rejects unsigned or malformed payloads.

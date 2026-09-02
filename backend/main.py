@@ -4,12 +4,12 @@ Proxies chat requests from the web dashboard to a local Ollama instance.
 Eliminates CORS issues and provides a single endpoint for the front-end.
 """
 
+import httpx
+import os
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import httpx
-import os
-import json
 
 app = FastAPI(
     title="SHADOW313 Backend",
@@ -67,6 +67,11 @@ async def health():
                     "models": model_names,
                     "active_model": OLLAMA_MODEL,
                 }
+            return {
+                "status": "degraded",
+                "ollama": "error",
+                "error": f"Ollama returned status {resp.status_code}",
+            }
     except Exception as exc:
         return {
             "status": "degraded",
@@ -128,7 +133,13 @@ async def chat(request: ChatRequest):
             detail=f"Ollama error: {resp.text[:500]}",
         )
 
-    data = resp.json()
+    try:
+        data = resp.json()
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Ollama returned invalid JSON: {exc}",
+        )
     reply = data.get("message", {}).get("content", "").strip()
 
     if not reply:
