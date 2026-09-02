@@ -11,18 +11,29 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Skip deploy when token is missing
-        if: ${{ env.VERCEL_TOKEN == '' }}
-        run: echo "Skipping deploy: VERCEL_TOKEN is not configured."
+      - name: Skip deploy when Vercel secrets are missing
+        if: ${{ env.VERCEL_TOKEN == '' || env.VERCEL_PROJECT_ID == '' || env.VERCEL_ORG_ID == '' }}
+        run: echo "Skipping deploy: VERCEL_TOKEN, VERCEL_PROJECT_ID, and VERCEL_ORG_ID must all be configured."
+
+      - name: Pull Vercel project settings
+        if: ${{ env.VERCEL_TOKEN != '' && env.VERCEL_PROJECT_ID != '' && env.VERCEL_ORG_ID != '' }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Deploy Production
-        if: ${{ env.VERCEL_TOKEN != '' }}
-        run: vercel --prod --yes
+        if: ${{ env.VERCEL_TOKEN != '' && env.VERCEL_PROJECT_ID != '' && env.VERCEL_ORG_ID != '' }}
+        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"
