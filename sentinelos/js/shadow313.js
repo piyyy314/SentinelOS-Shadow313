@@ -573,14 +573,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchAiResponse = async (input) => {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ message: input })
-        });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.reply) throw new Error(data.error || 'AI Gateway request failed');
-        return data.reply;
+        const endpoints = [
+            'http://localhost:8000/api/chat',
+            '/api/chat'
+        ];
+
+        let lastError = null;
+        for (const url of endpoints) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: input })
+                });
+                const data = await response.json().catch(() => ({}));
+                if (response.ok && data.reply) return data.reply;
+                lastError = new Error(data.error || data.detail || 'AI Gateway request failed');
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        throw lastError || new Error('All AI endpoints unavailable');
     };
 
     const handleChatInput = () => {
