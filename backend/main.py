@@ -21,14 +21,17 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:8081",
-        "http://127.0.0.1:8081",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+        origin.strip()
+        for origin in os.getenv(
+            "CORS_ORIGINS",
+            "http://localhost:8081,http://127.0.0.1:8081,"
+            "http://localhost:3000,http://127.0.0.1:3000",
+        ).split(",")
+        if origin.strip()
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
@@ -91,10 +94,23 @@ async def chat(request: ChatRequest):
     """
     # Normalize messages
     if request.messages:
+        if len(request.messages) > 50:
+            raise HTTPException(status_code=400, detail="Too many messages; limit is 50")
         messages = [{"role": m.role, "content": m.content} for m in request.messages]
     elif request.message:
         messages = [{"role": "user", "content": request.message}]
     else:
+        raise HTTPException(status_code=400, detail="A message is required")
+
+    messages = [
+        {
+            "role": m["role"] if m["role"] in {"assistant", "system"} else "user",
+            "content": str(m["content"])[:4000],
+        }
+        for m in messages
+        if str(m["content"]).strip()
+    ]
+    if not messages:
         raise HTTPException(status_code=400, detail="A message is required")
 
     # Prepend system prompt

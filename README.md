@@ -54,6 +54,23 @@ You can start from `.env.example` when setting local environment variables.
 
 The standalone FastAPI backend in `/backend` uses `OLLAMA_URL` and `OLLAMA_MODEL` instead.
 
+When running the standalone FastAPI backend from `/backend`, you can also override the local browser allowlist with `CORS_ORIGINS` as a comma-separated list of origins.
+
+### API endpoints
+
+- `GET /api/health` returns a lightweight JSON status payload for deployed functions.
+- `POST /api/chat` accepts either `{"message":"..."}` or `{"messages":[...]}` and returns `{"reply":"..."}`.
+- `POST /api/webhooks/vercel` accepts signed Vercel deployment webhook events.
+
+Common API error responses:
+
+- `400` invalid JSON or invalid chat payload
+- `403` invalid webhook signature
+- `413` request body too large
+- `502` upstream AI/Ollama failure
+- `503` missing runtime configuration
+- `504` upstream Ollama timeout
+
 ### Vercel deployment webhooks
 
 `POST /api/webhooks/vercel` accepts signed deployment webhook events. Set the same random value as `VERCEL_WEBHOOK_SECRET` in the Explorer production environment and in the webhook configuration. Subscribe only to **Deployment Succeeded** and **Deployment Error** events. The handler rejects unsigned or malformed payloads.
@@ -69,6 +86,12 @@ vercel dev
 ```
 
 Open the local URL printed by the command. The project has no `localhost:8080` configuration.
+
+To run the standalone FastAPI proxy instead, install `/home/runner/work/SentinelOS-Shadow313/SentinelOS-Shadow313/backend/requirements.txt`, set `OLLAMA_URL` and `OLLAMA_MODEL`, then run:
+
+```bash
+python /home/runner/work/SentinelOS-Shadow313/SentinelOS-Shadow313/backend/main.py
+```
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

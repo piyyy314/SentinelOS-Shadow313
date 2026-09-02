@@ -1,10 +1,14 @@
 const AI_GATEWAY_URL = 'https://ai-gateway.vercel.sh/v1/chat/completions';
 const DEFAULT_MODEL = 'openai/gpt-5.5';
 const DEFAULT_OLLAMA_URL = 'http://127.0.0.1:11434';
+const MAX_BODY_BYTES = 1024 * 1024;
+const MAX_MESSAGES = 50;
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
   res.end(JSON.stringify(payload));
 }
 
@@ -14,7 +18,12 @@ async function readJsonBody(req) {
   }
 
   let body = '';
-  for await (const chunk of req) body += chunk;
+  for await (const chunk of req) {
+    body += chunk;
+    if (Buffer.byteLength(body, 'utf8') > MAX_BODY_BYTES) {
+      throw new Error('Request body too large');
+    }
+  }
   return body ? JSON.parse(body) : {};
 }
 
@@ -23,9 +32,18 @@ function normalizeMessages(input) {
     ? input.messages
     : [{ role: 'user', content: String(input.message || '') }];
 
+  if (rawMessages.length > MAX_MESSAGES) {
+    throw new Error(`Too many messages; limit is ${MAX_MESSAGES}`);
+  }
+
   return rawMessages
     .map((message) => ({
-      role: message.role === 'assistant' ? 'assistant' : 'user',
+      role:
+        message.role === 'assistant'
+          ? 'assistant'
+          : message.role === 'system'
+            ? 'system'
+            : 'user',
       content: String(message.content || '').slice(0, 4000),
     }))
     .filter((message) => message.content.trim());
@@ -61,12 +79,22 @@ module.exports = async function handler(req, res) {
 
   let payload;
   try {
+    const contentLength = Number(req.headers['content-length'] || 0);
+    if (contentLength > MAX_BODY_BYTES) {
+      return sendJson(res, 413, { error: 'Request body too large' });
+    }
     payload = await readJsonBody(req);
-  } catch (_error) {
-    return sendJson(res, 400, { error: 'Invalid JSON body' });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Invalid JSON body';
+    return sendJson(res, message === 'Request body too large' ? 413 : 400, { error: message });
   }
 
-  const messages = normalizeMessages(payload);
+  let messages;
+  try {
+    messages = normalizeMessages(payload);
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || 'Invalid chat payload' });
+  }
   if (!messages.length) {
     return sendJson(res, 400, { error: 'A message is required' });
   }
