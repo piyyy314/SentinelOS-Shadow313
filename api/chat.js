@@ -3,6 +3,10 @@ const DEFAULT_MODEL = 'openai/gpt-5.5';
 const DEFAULT_OLLAMA_URL = 'http://127.0.0.1:11434';
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_MESSAGES = 50;
+const RATE_LIMIT_WINDOW_SECONDS = Number(process.env.RATE_LIMIT_WINDOW_SECONDS || 60);
+const RATE_LIMIT_WINDOW_MS = RATE_LIMIT_WINDOW_SECONDS * 1000;
+const CHAT_RATE_LIMIT_MAX = Number(process.env.CHAT_RATE_LIMIT_MAX || 30);
+const rateLimitHits = new Map();
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
@@ -25,6 +29,27 @@ async function readJsonBody(req) {
     }
   }
   return body ? JSON.parse(body) : {};
+}
+
+function getClientIp(req) {
+  const forwardedFor = req.headers['x-forwarded-for'];
+  if (typeof forwardedFor === 'string' && forwardedFor.trim()) {
+    return forwardedFor.split(',')[0].trim();
+  }
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+function checkRateLimit(key, limit) {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  const hits = (rateLimitHits.get(key) || []).filter((timestamp) => timestamp > windowStart);
+  if (hits.length >= limit) {
+    rateLimitHits.set(key, hits);
+    return false;
+  }
+  hits.push(now);
+  rateLimitHits.set(key, hits);
+  return true;
 }
 
 function normalizeMessages(input) {
@@ -53,6 +78,11 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return sendJson(res, 405, { error: 'Method not allowed' });
+  }
+
+  if (!checkRateLimit(`chat:${getClientIp(req)}`, CHAT_RATE_LIMIT_MAX)) {
+    res.setHeader('Retry-After', String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)));
+    return sendJson(res, 429, { error: 'Too many requests. Please retry shortly.' });
   }
 
   const ollamaBaseUrl = process.env.OLLAMA_BASE_URL;

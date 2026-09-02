@@ -405,14 +405,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchCircuitQasm = async (circuitName) => {
+        const assetCandidates = [
+            `/shadow313/assets/circuits/${circuitName}.qasm`,
+            `../shadow313/assets/circuits/${circuitName}.qasm`,
+            `assets/circuits/${circuitName}.qasm`
+        ];
         try {
-            // Attempt to dynamically fetch OpenQASM file from tracked assets
-            const response = await fetch(`/shadow313/assets/circuits/${circuitName}.qasm`);
-            if (response.ok) {
+            for (const assetPath of assetCandidates) {
+                const response = await fetch(assetPath);
+                if (!response.ok) continue;
                 const qasmText = await response.text();
                 circuitCodes[circuitName].qasm = qasmText;
                 updateCodeExporterUI();
                 console.log(`Successfully fetched dynamic QASM asset: ${circuitName}.qasm`);
+                break;
             }
         } catch (err) {
             console.warn(`Dynamic QASM fetch failed, using local fallback:`, err);

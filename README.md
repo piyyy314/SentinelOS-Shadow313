@@ -66,6 +66,7 @@ Common API error responses:
 
 - `400` invalid JSON or invalid chat payload
 - `403` invalid webhook signature
+- `429` too many requests
 - `413` request body too large
 - `502` upstream AI/Ollama failure
 - `503` missing runtime configuration
@@ -75,7 +76,16 @@ Common API error responses:
 
 `POST /api/webhooks/vercel` accepts signed deployment webhook events. Set the same random value as `VERCEL_WEBHOOK_SECRET` in the Explorer production environment and in the webhook configuration. Subscribe only to **Deployment Succeeded** and **Deployment Error** events. The handler rejects unsigned or malformed payloads.
 
+Vercel signs the raw webhook body in the `x-vercel-signature` header using the shared webhook secret. The current handler expects Vercel's documented HMAC-SHA1 format.
+
 For GitHub Actions production deploys, also configure `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, and `VERCEL_ORG_ID` repository secrets so the Vercel CLI can link the correct project non-interactively.
+
+Optional abuse-protection environment variables:
+
+- `RATE_LIMIT_WINDOW_SECONDS`
+- `CHAT_RATE_LIMIT_MAX`
+- `WEBHOOK_RATE_LIMIT_MAX`
+- `WEBHOOK_MAX_BODY_BYTES`
 
 ### Run locally
 

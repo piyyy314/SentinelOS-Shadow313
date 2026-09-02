@@ -2114,12 +2114,18 @@ const updateLandingCodeExporterUI = () => {
 };
 
 const fetchLandingCircuitQasm = async (circuitName) => {
+    const assetCandidates = [
+        `assets/circuits/${circuitName}.qasm`,
+        `/shadow313/assets/circuits/${circuitName}.qasm`
+    ];
     try {
-        const response = await fetch(`/shadow313/assets/circuits/${circuitName}.qasm`);
-        if (response.ok) {
+        for (const assetPath of assetCandidates) {
+            const response = await fetch(assetPath);
+            if (!response.ok) continue;
             const qasmText = await response.text();
             landingCircuitCodes[circuitName].qasm = qasmText;
             updateLandingCodeExporterUI();
+            break;
         }
     } catch (err) {
         console.warn(`Landing dynamic QASM fetch failed:`, err);
