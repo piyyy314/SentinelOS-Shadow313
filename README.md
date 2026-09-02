@@ -48,11 +48,44 @@ export OLLAMA_MODEL=<your-ollama-model>
 vercel dev
 ```
 
+You can start from `.env.example` when setting local environment variables.
+
 `OLLAMA_BASE_URL` is local-only. Do not set it for Vercel production, because `127.0.0.1` in a Vercel Function is not your computer. Without it, the API uses Vercel AI Gateway. For non-Vercel local development, set `AI_GATEWAY_API_KEY` and optionally `AI_GATEWAY_MODEL` instead.
+
+The standalone FastAPI backend in `/backend` uses `OLLAMA_URL` and `OLLAMA_MODEL` instead.
+
+When running the standalone FastAPI backend from `/backend`, you can also override the local browser allowlist with `CORS_ORIGINS` as a comma-separated list of origins.
+
+### API endpoints
+
+- `GET /api/health` returns a lightweight JSON status payload for deployed functions.
+- `POST /api/chat` accepts either `{"message":"..."}` or `{"messages":[...]}` and returns `{"reply":"..."}`.
+- `POST /api/webhooks/vercel` accepts signed Vercel deployment webhook events.
+
+Common API error responses:
+
+- `400` invalid JSON or invalid chat payload
+- `403` invalid webhook signature
+- `429` too many requests
+- `413` request body too large
+- `502` upstream AI/Ollama failure
+- `503` missing runtime configuration
+- `504` upstream Ollama timeout
 
 ### Vercel deployment webhooks
 
 `POST /api/webhooks/vercel` accepts signed deployment webhook events. Set the same random value as `VERCEL_WEBHOOK_SECRET` in the Explorer production environment and in the webhook configuration. Subscribe only to **Deployment Succeeded** and **Deployment Error** events. The handler rejects unsigned or malformed payloads.
+
+Vercel signs the raw webhook body in the `x-vercel-signature` header using the shared webhook secret. The current handler expects Vercel's documented HMAC-SHA1 format.
+
+For GitHub Actions production deploys, also configure `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, and `VERCEL_ORG_ID` repository secrets so the Vercel CLI can link the correct project non-interactively.
+
+Optional abuse-protection environment variables:
+
+- `RATE_LIMIT_WINDOW_SECONDS`
+- `CHAT_RATE_LIMIT_MAX`
+- `WEBHOOK_RATE_LIMIT_MAX`
+- `WEBHOOK_MAX_BODY_BYTES`
 
 ### Run locally
 
@@ -63,6 +96,12 @@ vercel dev
 ```
 
 Open the local URL printed by the command. The project has no `localhost:8080` configuration.
+
+To run the standalone FastAPI proxy instead, install `/home/runner/work/SentinelOS-Shadow313/SentinelOS-Shadow313/backend/requirements.txt`, set `OLLAMA_URL` and `OLLAMA_MODEL`, then run:
+
+```bash
+python /home/runner/work/SentinelOS-Shadow313/SentinelOS-Shadow313/backend/main.py
+```
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

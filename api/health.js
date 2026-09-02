@@ -7,6 +7,8 @@ module.exports = function handler(req, res) {
 
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
 
   res.end(
     JSON.stringify({

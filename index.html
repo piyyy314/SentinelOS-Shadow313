@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="OaFfTr-W8XG8ZETZcbrhAOXJbqllkF-0H1ME_BuMnlI" />
-    <title>Redirecting to SHADOW313...</title>
+    <title>Redirecting...</title>
     <!-- Vercel Speed Insights -->
     <script>
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
-    <!-- Automatic redirect to the shadow313 folder -->
-    <meta http-equiv="refresh" content="0; url=/shadow313/" />
     <style>
         body {
             background-color: #000;
@@ -26,10 +24,22 @@
     </style>
 </head>
 <body>
-    <p>Initializing connection to SHADOW313... If not redirected, <a href="/shadow313/" style="color: #00ff00;">click here</a>.</p>
+    <p id="redirect-copy">Initializing platform routing... If not redirected, choose <a href="/sentinelos/" style="color: #00ff00;">SentinelOS</a> or <a href="/shadow313/" style="color: #00ff00;">SHADOW313</a>.</p>
+    <noscript>
+        <p>JavaScript is disabled. Open <a href="/sentinelos/" style="color: #00ff00;">SentinelOS</a> or <a href="/shadow313/" style="color: #00ff00;">SHADOW313</a>.</p>
+    </noscript>
     <script>
-        // Fallback JavaScript redirect
-        window.location.replace('/shadow313/');
+        const host = window.location.hostname;
+        const target = host === 'shadow313.dev'
+            ? '/sentinelos/'
+            : '/shadow313/';
+        const copy = document.getElementById('redirect-copy');
+        if (copy) {
+            copy.innerHTML = target === '/sentinelos/'
+                ? 'Initializing connection to SentinelOS... If not redirected, <a href="/sentinelos/" style="color: #00ff00;">click here</a>.'
+                : 'Initializing connection to SHADOW313... If not redirected, <a href="/shadow313/" style="color: #00ff00;">click here</a>.';
+        }
+        window.location.replace(target);
     </script>
 </body>
 </html>

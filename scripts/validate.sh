@@ -15,5 +15,12 @@ find . \
 echo "Checking Python syntax..."
 
 python -m py_compile aegis_ultimate.py
+python -m py_compile backend/main.py
+
+echo "Checking JavaScript syntax..."
+
+find api sentinelos/js \
+  -name "*.js" \
+  -exec node --check {} \;
 
 echo "Validation complete."
